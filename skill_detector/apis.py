@@ -7,8 +7,9 @@ from rest_framework import views, status, permissions
 from rest_framework.response import Response
 
 from .openai_apis import get_career_vector
-from .DB_operator import get_skill_vectors, insert_career, exist_career, update_career
+from .DB_operator import insert_career, exist_career, update_career
 from .calculators import get_skill_similarity, similarities_to_scores
+from .apps import SKILL_IDS, SKILL_VECTORS
 
 
 def record_career(
@@ -18,28 +19,20 @@ def record_career(
         address: str,
         career_id: Optional[int] = None
 ) -> int:
-    log = []
-    start = time.time()
     career_vector = get_career_vector(input_text)
-    log.append(time.time() - start)
-    start = time.time()
-    skill_ids, skill_vectors = get_skill_vectors()
-    log.append(time.time() - start)
 
     term = finished_at - started_at
     # 1年を1ポイントとしてスケーリング
     scaling_point = term.days / 365
 
-    start = time.time()
-    skill_similarities = get_skill_similarity(skill_vectors, career_vector)
+    skill_similarities = get_skill_similarity(SKILL_VECTORS, career_vector)
     skill_scores = similarities_to_scores(skill_similarities, scaling_point)
-    log.append(time.time() - start)
 
     start = time.time()
     if career_id is None:
         current_career_id = insert_career(
             career_vector=career_vector,
-            skill_ids=skill_ids,
+            skill_ids=SKILL_IDS,
             skill_scores=skill_scores,
             finished_at=finished_at,
             started_at=started_at,
@@ -49,7 +42,7 @@ def record_career(
     else:
         current_career_id = update_career(
             career_vector=career_vector,
-            skill_ids=skill_ids,
+            skill_ids=SKILL_IDS,
             skill_scores=skill_scores,
             finished_at=finished_at,
             started_at=started_at,
@@ -57,9 +50,6 @@ def record_career(
             address=address,
             career_id=career_id
         )
-    log.append(time.time() - start)
-    with open("log.txt", "w", encoding="utf-8") as f:
-        f.write(f"{log}")
 
     return current_career_id
 
