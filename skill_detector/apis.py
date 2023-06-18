@@ -1,6 +1,7 @@
 import json
 import datetime
 from typing import Optional
+import time
 
 from rest_framework import views, status, permissions
 from rest_framework.response import Response
@@ -17,16 +18,22 @@ def record_career(
         address: str,
         career_id: Optional[int] = None
 ) -> int:
+    log = []
+    start = time.time()
     career_vector = get_career_vector(input_text)
     skill_ids, skill_vectors = get_skill_vectors()
+    log.append(time.time() - start)
 
     term = finished_at - started_at
     # 1年を1ポイントとしてスケーリング
     scaling_point = term.days / 365
 
+    start = time.time()
     skill_similarities = get_skill_similarity(skill_vectors, career_vector)
     skill_scores = similarities_to_scores(skill_similarities, scaling_point)
+    log.append(time.time() - start)
 
+    start = time.time()
     if career_id is None:
         current_career_id = insert_career(
             career_vector=career_vector,
@@ -48,6 +55,9 @@ def record_career(
             address=address,
             career_id=career_id
         )
+    log.append(time.time() - start)
+    with open("log.txt", "w", encoding="utf-8") as f:
+        f.write(f"{log}")
 
     return current_career_id
 
