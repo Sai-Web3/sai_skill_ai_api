@@ -14,7 +14,7 @@ def record_career(
         started_at: datetime.datetime,
         finished_at: datetime.datetime,
         input_text: str,
-        sbt_id: int,
+        wallet_address: str,
         career_id: Optional[int] = None
 ) -> int:
     career_vector = get_career_vector(input_text)
@@ -34,7 +34,7 @@ def record_career(
             finished_at=finished_at,
             started_at=started_at,
             input_text=input_text,
-            sbt_id=sbt_id
+            wallet_address=wallet_address
         )
     else:
         current_career_id = update_career(
@@ -43,7 +43,7 @@ def record_career(
             finished_at=finished_at,
             started_at=started_at,
             input_text=input_text,
-            sbt_id=sbt_id,
+            wallet_address=wallet_address,
             career_id=career_id
         )
 
@@ -61,8 +61,8 @@ class SkillElementPostView(views.APIView):
             input_text = body["input_text"]
             if not isinstance(input_text, str):
                 raise ValueError()
-            sbt_id = body["sbt_id"]
-            if not isinstance(sbt_id, int):
+            wallet_address = body["wallet_address"]
+            if not isinstance(wallet_address, str):
                 raise ValueError()
 
         except:
@@ -72,7 +72,7 @@ class SkillElementPostView(views.APIView):
             started_at,
             finished_at,
             input_text,
-            sbt_id
+            wallet_address
         )
 
         context = {
@@ -94,8 +94,8 @@ class SkillElementPutView(views.APIView):
             input_text = body["input_text"]
             if not isinstance(input_text, str):
                 raise ValueError()
-            sbt_id = body["sbt_id"]
-            if not isinstance(sbt_id, int):
+            wallet_address = body["wallet_address"]
+            if not isinstance(wallet_address, str):
                 raise ValueError()
             if exist_career(career_id) is False:
                 raise ValueError()
@@ -107,7 +107,7 @@ class SkillElementPutView(views.APIView):
             started_at,
             finished_at,
             input_text,
-            sbt_id,
+            wallet_address,
             career_id
         )
 
