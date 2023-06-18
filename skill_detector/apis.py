@@ -18,14 +18,14 @@ def record_career(
         career_id: Optional[int] = None
 ) -> int:
     career_vector = get_career_vector(input_text)
-    skill_vectors_dict = get_skill_vectors()
+    skill_ids, skill_vectors = get_skill_vectors()
 
     term = finished_at - started_at
     # 1年を1ポイントとしてスケーリング
     scaling_point = term.days / 365
 
-    skill_similarities_dict = get_skill_similarity(skill_vectors_dict, career_vector)
-    skill_scores_dict = similarities_to_scores(skill_similarities_dict, scaling_point)
+    skill_similarities_dict = get_skill_similarity(skill_vectors, career_vector)
+    skill_scores = similarities_to_scores(skill_similarities_dict, scaling_point)
 
     if career_id is None:
         current_career_id = insert_career(

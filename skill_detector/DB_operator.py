@@ -17,14 +17,17 @@ def float_array_to_str(float_array: np.ndarray) -> str:
     return float_array_str
 
 
-def get_skill_vectors() -> dict[int, np.ndarray]:
+def get_skill_vectors() -> tuple[list[int], np.ndarray]:
     with connection.cursor() as cursor:
         cursor.execute("select skill_id, skill_float_vector from skills")
         results = cursor.fetchall()
 
-    skill_vectors_dict = {label: str_to_float_array(vector) for label, vector in results}
+    skill_ids, vectors = [], []
+    for skill_id, vector in results:
+        skill_ids.append(skill_id)
+        vectors.append(str_to_float_array(vector))
 
-    return skill_vectors_dict
+    return skill_ids, np.stack(vectors)
 
 
 def insert_career(
@@ -33,7 +36,8 @@ def insert_career(
         input_text: str,
         started_at: datetime,
         finished_at: datetime,
-        skill_values_dict: dict[int, int]
+        skill_ids: list[int],
+        skill_scores: np.ndarray,
 ) -> int:
     str_career_vector = float_array_to_str(career_vector)
     started_at = started_at.strftime("%Y-%m-%d")
@@ -50,8 +54,8 @@ def insert_career(
             cursor.execute("select last_insert_id();")
 
             current_career_id = cursor.fetchone()[0]
-            career_skill_values = [[current_career_id, skill_id, value] for skill_id, value, in
-                                   skill_values_dict.items()]
+            career_skill_values = [[current_career_id, skill_id, score] for skill_id, score, in
+                                   zip(skill_ids, skill_scores)]
 
             # career_skill_valuesにすべてのスキルの値を保存する
             query = "insert into career_skill_values (career_id, skill_id, value) " \
@@ -71,7 +75,8 @@ def update_career(
         input_text: str,
         started_at: datetime,
         finished_at: datetime,
-        skill_values_dict: dict[int, int],
+        skill_ids: list[int],
+        skill_scores: np.ndarray,
         career_id: int
 ) -> int:
     str_career_vector = float_array_to_str(career_vector)
@@ -86,8 +91,8 @@ def update_career(
 
             cursor.execute(query, (address, str_career_vector, input_text, started_at, finished_at, career_id))
 
-            career_skill_values = [[value, career_id, skill_id] for skill_id, value, in
-                                   skill_values_dict.items()]
+            career_skill_values = [[score, career_id, skill_id] for skill_id, score, in
+                                   zip(skill_ids, skill_scores)]
 
             # career_skill_valuesにすべてのスキルの値を保存する
             query = "update career_skill_values set value=%s where career_id=%s and skill_id=%s;"
