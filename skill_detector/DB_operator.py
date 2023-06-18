@@ -28,7 +28,7 @@ def get_skill_vectors() -> dict[int, np.ndarray]:
 
 
 def insert_career(
-        wallet_address: str,
+        address: str,
         career_vector: np.ndarray,
         input_text: str,
         started_at: datetime,
@@ -43,10 +43,10 @@ def insert_career(
         try:
             # careerに入力値を保存する
             query = "insert into careers " \
-                    "(wallet_address, career_float_vector, input_text, started_at, finished_at) " \
+                    "(address, career_float_vector, input_text, started_at, finished_at) " \
                     "values (%s, %s, %s, %s, %s);"
 
-            cursor.execute(query, (wallet_address, str_career_vector, input_text, started_at, finished_at))
+            cursor.execute(query, (address, str_career_vector, input_text, started_at, finished_at))
             cursor.execute("select last_insert_id();")
 
             current_career_id = cursor.fetchone()[0]
@@ -66,7 +66,7 @@ def insert_career(
 
 
 def update_career(
-        wallet_address: str,
+        address: str,
         career_vector: np.ndarray,
         input_text: str,
         started_at: datetime,
@@ -81,10 +81,10 @@ def update_career(
     with connection.cursor() as cursor:
         try:
             # careerに入力値を保存する
-            query = "update careers set wallet_address=%s, career_float_vector=%s, input_text=%s, " \
+            query = "update careers set address=%s, career_float_vector=%s, input_text=%s, " \
                     "started_at=%s, finished_at=%s where id=%s;"
 
-            cursor.execute(query, (wallet_address, str_career_vector, input_text, started_at, finished_at, career_id))
+            cursor.execute(query, (address, str_career_vector, input_text, started_at, finished_at, career_id))
 
             career_skill_values = [[value, career_id, skill_id] for skill_id, value, in
                                    skill_values_dict.items()]
