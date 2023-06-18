@@ -1,7 +1,6 @@
 import json
 import datetime
 from typing import Optional
-import time
 
 from rest_framework import views, status, permissions
 from rest_framework.response import Response
@@ -25,10 +24,8 @@ def record_career(
     # 1年を1ポイントとしてスケーリング
     scaling_point = term.days / 365
 
-    start = time.time()
     skill_similarities = get_skill_similarity(skill_vectors, career_vector)
     skill_scores = similarities_to_scores(skill_similarities, scaling_point)
-    print(time.time() - start)
 
     if career_id is None:
         current_career_id = insert_career(
