@@ -54,7 +54,7 @@ def insert_career(
             cursor.execute("select last_insert_id();")
 
             current_career_id = cursor.fetchone()[0]
-            career_skill_values = [[current_career_id, skill_id, score] for skill_id, score, in
+            career_skill_values = [[current_career_id, skill_id, int(score)] for skill_id, score, in
                                    zip(skill_ids, skill_scores)]
 
             # career_skill_valuesにすべてのスキルの値を保存する
@@ -91,7 +91,7 @@ def update_career(
 
             cursor.execute(query, (address, str_career_vector, input_text, started_at, finished_at, career_id))
 
-            career_skill_values = [[score, career_id, skill_id] for skill_id, score, in
+            career_skill_values = [[int(score), career_id, skill_id] for skill_id, score, in
                                    zip(skill_ids, skill_scores)]
 
             # career_skill_valuesにすべてのスキルの値を保存する
