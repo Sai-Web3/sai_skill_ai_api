@@ -13,6 +13,6 @@ import sys
 from django.core.wsgi import get_wsgi_application
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'sai_skill_api.settings')
-sys.path.append('/home/saiuser/hackathon-ai-backend/sai_skill_api')
+sys.path.append('/home/saiuser/sai_skill_api')
 
 application = get_wsgi_application()

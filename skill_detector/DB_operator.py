@@ -43,8 +43,8 @@ def insert_career(
         try:
             # careerに入力値を保存する
             query = "insert into careers " \
-                    "(sbt_id, career_float_vector, input_text, started_at, finished_at, created_at) " \
-                    "values (%s, %s, %s, %s, %s, now());"
+                    "(sbt_id, career_float_vector, input_text, started_at, finished_at) " \
+                    "values (%s, %s, %s, %s, %s);"
 
             cursor.execute(query, (sbt_id, str_career_vector, input_text, started_at, finished_at))
             cursor.execute("select last_insert_id();")
@@ -82,7 +82,7 @@ def update_career(
         try:
             # careerに入力値を保存する
             query = "update careers set sbt_id=%s, career_float_vector=%s, input_text=%s, " \
-                    "started_at=%s, finished_at=%s, updated_at=now() where id=%s;"
+                    "started_at=%s, finished_at=%s where id=%s;"
 
             cursor.execute(query, (sbt_id, str_career_vector, input_text, started_at, finished_at, career_id))
 
@@ -110,7 +110,7 @@ def init_skill_vectors():
             for label, skill_name in skills_dict.items():
                 skill_vector = get_skill_vector(skill_name)
                 str_skill_vector = float_array_to_str(skill_vector)
-                query = "update skills set skill_float_vector=%s, updated_at=now() where id=%s"
+                query = "update skills set skill_float_vector=%s where id=%s"
                 cursor.execute(query, (str_skill_vector, label))
             connection.commit()
         except Exception as e:
