@@ -30,7 +30,8 @@ def record_career(
     if career_id is None:
         current_career_id = insert_career(
             career_vector=career_vector,
-            skill_values_dict=skill_scores_dict,
+            skill_ids=skill_ids,
+            skill_scores=skill_scores,
             finished_at=finished_at,
             started_at=started_at,
             input_text=input_text,
@@ -39,7 +40,8 @@ def record_career(
     else:
         current_career_id = update_career(
             career_vector=career_vector,
-            skill_values_dict=skill_scores_dict,
+            skill_ids=skill_ids,
+            skill_scores=skill_scores,
             finished_at=finished_at,
             started_at=started_at,
             input_text=input_text,
