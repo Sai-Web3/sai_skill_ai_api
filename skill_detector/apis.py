@@ -27,7 +27,7 @@ def record_career(
     skill_similarities = get_skill_similarity(skill_vectors, career_vector)
     skill_scores = similarities_to_scores(skill_similarities, scaling_point)
 
-    """if career_id is None:
+    if career_id is None:
         current_career_id = insert_career(
             career_vector=career_vector,
             skill_ids=skill_ids,
@@ -48,8 +48,6 @@ def record_career(
             address=address,
             career_id=career_id
         )
-    """
-    current_career_id = 0
 
     return current_career_id
 
