@@ -21,6 +21,8 @@ def record_career(
     log = []
     start = time.time()
     career_vector = get_career_vector(input_text)
+    log.append(time.time() - start)
+    start = time.time()
     skill_ids, skill_vectors = get_skill_vectors()
     log.append(time.time() - start)
 
