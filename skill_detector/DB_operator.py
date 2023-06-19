@@ -108,7 +108,7 @@ def update_career(
 def init_skill_vectors():
     with connection.cursor() as cursor:
         try:
-            query = "select id, skill_name from skills"
+            query = "select id, query from skills"
             cursor.execute(query)
             skills_dict = {label: skill_name for label, skill_name in cursor.fetchall()}
 
