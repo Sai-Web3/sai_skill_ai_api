@@ -7,5 +7,5 @@ class SkillDetectorConfig(AppConfig):
     name = 'skill_detector'
 
 
-# init_skill_vectors()
+init_skill_vectors()
 SKILL_IDS, SKILL_VECTORS = get_skill_vectors()
