@@ -9,6 +9,9 @@ def get_career_vector(input_text: str) -> np.ndarray:
                         "calculate the skills a person would have based on the " \
                         "work history using the cosine similarity, so please output a vector for this purpose."
 
+    with open("input_text.txt", "w", encoding="utf-8") as f:
+        f.write(input_text + additional_prompt)
+
     embedding = get_embedding(input_text + additional_prompt, engine=OPENAI_DOC_EMBEDDING_ENGINE)
     return np.array(embedding)
 
