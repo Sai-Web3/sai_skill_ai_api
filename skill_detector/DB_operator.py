@@ -123,6 +123,8 @@ def init_skill_vectors():
             raise e
 
     print("Complete init skill vectors")
+    with open("result.txt", "w", encoding="utf-8") as f:
+        f.write("complete")
 
 
 def exist_career(career_id: int) -> bool:
