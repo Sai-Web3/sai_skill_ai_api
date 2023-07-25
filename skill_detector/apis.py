@@ -7,8 +7,8 @@ from rest_framework import views, status, permissions
 from rest_framework.response import Response
 
 from .openai_apis import get_career_vector
-from .DB_operator import insert_career, exist_career, update_career, get_all_exist_career, get_one_job, get_exist_jobs,get_one_career, insert_job, update_job
-from .calculators import get_skill_similarity, similarities_to_scores, calculate_common_elements_percentage
+from .DB_operator import insert_career, exist_career, update_career, get_all_exist_career, get_one_job, get_exist_jobs,get_one_career, insert_job, update_job, get_all_skills, get_all_jobs, get_skill_ids
+from .calculators import get_skill_similarity, similarities_to_scores, calculate_common_elements_percentage, flatten_list, get_common_elements
 from .apps import SKILL_IDS, SKILL_VECTORS
 from .gpt_turbo import get_chatgpt35_turbo_response
 
@@ -191,31 +191,40 @@ class SkillElementPutView(views.APIView):
 class SkillElementGPTView(views.APIView):
     permission_classes = (permissions.AllowAny,)
 
-    # POSTメソッドでアクセスされたときに呼び出される関数
     def post(self, request):
         try:
             body = json.loads(request.body)
             print(body)
             input_text = body["input_text"]
-            print(input_text)
             if not isinstance(input_text, str):
                 raise ValueError()
 
         except:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
+        skill_names = get_all_skills()
+        skill_names = flatten_list(skill_names)
+
         response = get_chatgpt35_turbo_response(input_text)
+
+        common_elements = get_common_elements(skill_names, response)
+
+        print(common_elements)
+
+        skill_ids = get_skill_ids(common_elements)
+
+        print(skill_ids)
+
+        skill_ids = flatten_list(skill_ids)
 
         context = {
             "status": 200,
-            "response": response
+            "response": skill_ids
         }
 
         return Response(context, status=status.HTTP_200_OK)
     
-# 発注を行うための関数
-# Q: views.APIViewとは？
-# A: APIViewはDjango REST Frameworkのクラスで、APIのエンドポイントを作成するためのクラス
+# 発注を行うためのクラス
 class JobPostView(views.APIView):
     permission_classes = (permissions.AllowAny,)
 
@@ -253,15 +262,14 @@ class JobPostView(views.APIView):
 class JobsView(views.APIView):
     permission_classes = (permissions.AllowAny,)
 
-    # データベースから発注を取得する関数
     def get(self, request):
         try:
-            job_ids = get_exist_jobs()
+            jobs = get_all_jobs()
         except:
             return Response(status=status.HTTP_400_BAD_REQUEST)
         context = {
             "status": 200,
-            "order_data": job_ids
+            "order_data": jobs
         }
 
         return Response(context, status=status.HTTP_200_OK)
@@ -281,12 +289,11 @@ class JobsView(views.APIView):
             title = body["title"]
             if not isinstance(title, str):
                 raise ValueError()
-        
+
         except:
-            # エラーの原因を調べるために、エラーの内容を出力する
             print(ValueError)
             return Response(status=status.HTTP_400_BAD_REQUEST)
-        
+
         id = insert_job(
             sbt_id,
             input_text,
@@ -304,13 +311,13 @@ class JobsView(views.APIView):
 class JobView(views.APIView):
     permission_classes = (permissions.AllowAny,)
 
-    # データベースから発注を取得する関数
+    # �~C~G�~C��~B��~C~Y�~C��~B��~A~K�~B~I�~Y�注�~B~R�~O~V�~W�~A~Y�~B~K�~V��~U�
     def get(self, request, job_id):
         try:
                 job_id = int(job_id)
         except:
             return Response(status=status.HTTP_400_BAD_REQUEST)
-        
+
         job_data = get_one_job(job_id)
 
         context = {
@@ -319,7 +326,7 @@ class JobView(views.APIView):
         }
 
         return Response(context, status=status.HTTP_200_OK)
-    
+
     def put(self, request, job_id):
         try:
             body = json.loads(request.body)
@@ -336,10 +343,10 @@ class JobView(views.APIView):
             title = body["title"]
             if not isinstance(title, str):
                 raise ValueError()
-        
+
         except:
             return Response(status=status.HTTP_400_BAD_REQUEST)
-        
+
         id = update_job(
             job_id,
             sbt_id,
@@ -351,28 +358,6 @@ class JobView(views.APIView):
         context = {
             "status": 200,
             "order_id": id
-        }
-
-        return Response(context, status=status.HTTP_200_OK)
-
-class MatchView(views.APIView):
-    permission_classes = (permissions.AllowAny,)
-
-    def get(self, request, career_id, job_id):
-        try:
-            job_id = int(job_id)
-            career_id = int(career_id)
-            
-            career = get_one_career(career_id)
-            job = get_one_job(job_id)
-        except:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
-        
-        match_data = calculate_common_elements_percentage(career, job)
-
-        context = {
-            "status": 200,
-            "match_data": match_data
         }
 
         return Response(context, status=status.HTTP_200_OK)

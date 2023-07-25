@@ -172,10 +172,6 @@ def get_all_exist_career() -> list[int]:
         career_ids = [career_id for career_id, in cursor.fetchall()]
     return career_ids
 
-# 特定のcareer_idを取得する
-# dictは辞書型
-# どのような形式？
-# {id: 1, address: "東京都", career_float_vector: "1,2,3,4,5", input_text: "テスト", started_at: "2021-01-01", finished_at: "2021-01-01"}
 def get_one_career(career_id: int) -> dict:
     with connection.cursor() as cursor:
         query = "select * from orders where id=%s"
@@ -191,12 +187,12 @@ def get_exist_jobs() -> list[int]:
         order_ids = [order_id for order_id, in cursor.fetchall()]
     return order_ids
 
-def get_one_job(job_id: int) -> dict:
+def get_one_career(career_id: int) -> dict:
     with connection.cursor() as cursor:
-        query = "select * from orders where id=%s"
-        cursor.execute(query, (job_id,))
-        job = cursor.fetchone()
-    return job
+        query = "select * from careers where id=%s"
+        cursor.execute(query, (career_id,))
+        career = cursor.fetchone()
+    return career
 
 def insert_job(sbt_id: int, input_text:str, is_finish_flag: bool, title: str) -> int:
     with connection.cursor() as cursor:
@@ -222,7 +218,13 @@ def update_job(id: int, sbt_id: int, input_text:str, is_finish_flag: bool, title
             raise e
     return id
 
-# jobsを全て取得する
+def get_one_job(job_id: int) -> dict:
+    with connection.cursor() as cursor:
+        query = "select * from jobs where id=%s"
+        cursor.execute(query, (job_id,))
+        job = cursor.fetchone()
+    return job
+
 def get_all_jobs() -> list[dict]:
     with connection.cursor() as cursor:
         query = "select * from jobs"
@@ -230,25 +232,22 @@ def get_all_jobs() -> list[dict]:
         jobs = cursor.fetchall()
     return jobs
 
-# skillsを全て取得する
+# Get All skill_name from skills table
 def get_all_skills() -> list[str]:
     with connection.cursor() as cursor:
         query = "select skill_name from skills"
         cursor.execute(query)
-        skills = cursor.fetchone()
+        skills = cursor.fetchall()
     return skills
 
 # Takes a list of skill_name as an argument and returns a list of skill_id
 def get_skill_ids(skill_names: list[str]) -> list[int]:
     with connection.cursor() as cursor:
-        # skill_namesの各要素にダブルクォーテーションをつける
         skill_names = [f'"{skill_name}"' for skill_name in skill_names]
         skill_names = ",".join(skill_names)
         print(skill_names)
-        query = "select id from skills where skill_name in " + "(" + skill_names + ")"
+        query = "select skill_id from skills where skill_name in " + "(" + skill_names + ")"
         cursor.execute(query)
-        # skill_namesをqueryに入れた後のqueryを取得する
 
         skill_ids = cursor.fetchall()
     return skill_ids
-
