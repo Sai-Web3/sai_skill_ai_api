@@ -20,3 +20,5 @@ def get_career_vector(input_text: str) -> np.ndarray:
 def get_skill_vector(query: str) -> np.ndarray:
     embedding = get_embedding(query, engine=OPENAI_QUERY_EMBEDDING_ENGINE)
     return np.array(embedding)
+
+
